@@ -1,4 +1,4 @@
-# Document Scanner: Semantic Segmentation using PyTorch-DeepLabV3
+# Document Scanner: Semantic Segmentation
 
 **This repository contains code for the blog post [Document Scanner: Semantic Segmentation using PyTorch-DeepLabV3](https://learnopencv.com/custom-document-segmentation-using-deep-learning/)**.
 
@@ -16,6 +16,17 @@ In this post, you will learn the following,
 
 [<img src="https://learnopencv.com/wp-content/uploads/2022/07/download-button-e1657285155454.png" alt="download" width="200">](https://www.dropbox.com/scl/fo/w3i08lmjnd6ba3td89a3p/h?dl=1&rlkey=unuq45366j21xctj9ovt9ehd3)
 
+### Setup
+- To create `environment`:
+```bash
+conda create -n env
+conda activate env
+pip install -r requirements.txt
+```
+- To run streamlit app:
+```bash
+streamlit run app.py --server.port 8080
+```
 ### Document Scanner Application
 
 <img src = 'app_images/app_demo.png'>
