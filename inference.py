@@ -96,7 +96,8 @@ def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10):
     image_model = torch.unsqueeze(image_model, dim=0)
 
     with torch.no_grad():
-        out = trained_model(image_model)["out"].cpu()
+        out = trained_model(image_model)
+        out= out["out"].cpu()
 
     del image_model
     gc.collect()
@@ -107,6 +108,7 @@ def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10):
     _out_extended = np.zeros((IMAGE_SIZE + r_H, IMAGE_SIZE + r_W), dtype=out.dtype)
     _out_extended[half : half + IMAGE_SIZE, half : half + IMAGE_SIZE] = out * 255
     out = _out_extended.copy()
+    cv2.imwrite("test.jpg", out)
 
     del _out_extended
     gc.collect()
@@ -229,6 +231,33 @@ if __name__ == "__main__":
     # model = load_model(model_name="mbv3")
     preprocess_transforms = image_preprocess_transforms()
     model = load_model(model_name="r50")
+
+    # convert onnx
+    image_path = "Epay_AI/IMG_20231214_104950.jpg"
+    image = cv2.imread(image_path)
+    h, w = image.shape[:2]
+    # IMAGE_SIZE = image_size
+    half = IMAGE_SIZE // 2
+
+    imH, imW, C = image.shape
+
+    image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_NEAREST)
+
+    scale_x = imW / IMAGE_SIZE
+    scale_y = imH / IMAGE_SIZE
+
+    image_model = preprocess_transforms(image_model)
+    print(image_model.shape)
+    image_model = torch.unsqueeze(image_model, dim=0)
+
+    torch.onnx.export(model, 
+                 image_model, 
+                 "res50.onnx", 
+                 verbose=True
+    )
+    
+
+
     for file in os.listdir(data_path):
         filepath = os.path.join(data_path, file)
         outfile_path = os.path.join(output_path, file)
@@ -239,6 +268,7 @@ if __name__ == "__main__":
         final = scan(image_true=image, trained_model=model, image_size=IMAGE_SIZE)
         # final = apply_enhancements(final)
         cv2.imwrite(outfile_path, final)
+        break
 
 
 
