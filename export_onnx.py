@@ -17,9 +17,18 @@ class wrapModel(torch.nn.Module):
     def __init__(self, model):
         super().__init__()
         self.model = model
-    
+        self.mean = (0.4611, 0.4359, 0.3905)
+        self.std=(0.2193, 0.2150, 0.2109)
+        self.transform = torchvision_T.Compose(
+                            [
+                                # torchvision_T.ToTensor(),
+                                torchvision_T.Normalize(self.mean, self.std),
+                            ]
+        )
+                        
     def forward(self, image):
-        out = self.model(image)
+        input_image = self.transform(image)
+        out = self.model(input_image)
         out = out["out"]
         out = torch.argmax(out, dim=1, keepdims=True).permute(0, 2, 3, 1)[0].squeeze()
         out = out.to(torch.int32)
@@ -46,7 +55,7 @@ def load_model(num_classes=2, model_name="mbv3", device=torch.device("cpu")):
 def image_preprocess_transforms(mean=(0.4611, 0.4359, 0.3905), std=(0.2193, 0.2150, 0.2109)):
     common_transforms = torchvision_T.Compose(
         [
-            torchvision_T.ToTensor(),
+            # torchvision_T.ToTensor(),
             torchvision_T.Normalize(mean, std),
         ]
     )
@@ -75,8 +84,13 @@ if __name__ == "__main__":
 
     scale_x = imW / IMAGE_SIZE
     scale_y = imH / IMAGE_SIZE
+    print(image_model.shape)
+    print(type(image_model))
+    image_model = torch.Tensor(image_model.transpose((2,0,1)))/255.0
 
-    image_model = preprocess_transforms(image_model)
+    # print(image_model.shape)
+
+    # image_model = preprocess_transforms(image_model)
     print(image_model.shape)
     image_model = torch.unsqueeze(image_model, dim=0)
 
@@ -84,7 +98,7 @@ if __name__ == "__main__":
 
     torch.onnx.export(wrap, 
                  image_model, 
-                 "wrap.onnx", 
+                 "wrap_with_preprocess.onnx", 
                  input_names=['input'],
                  output_names=['output'],
                  verbose=True

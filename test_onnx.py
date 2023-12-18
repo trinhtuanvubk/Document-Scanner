@@ -66,14 +66,18 @@ image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTE
 scale_x = imW / IMAGE_SIZE
 scale_y = imH / IMAGE_SIZE
 
+# for wrap.onnx
+# image_model = common_transforms(image_model)
 
-image_model = common_transforms(image_model)
+image_model = np.asarray(image_model.transpose((2,0,1))/255.0, dtype=np.float32)
+
 print(image_model.shape)
-
+print(image_model.dtype)
 # ==============================================================
 
 
-sess = onnxruntime.InferenceSession('./wrap.onnx',providers=['CPUExecutionProvider'])
+# sess = onnxruntime.InferenceSession('./wrap.onnx',providers=['CPUExecutionProvider'])
+sess = onnxruntime.InferenceSession('./wrap_with_preprocess.onnx',providers=['CPUExecutionProvider'])
 
 inputs_name = [x.name for x in sess.get_inputs()]
 outputs_name = [x.name for x in sess.get_outputs()]
