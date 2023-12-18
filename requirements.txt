@@ -3,3 +3,19 @@ torchvision==0.15.2
 opencv-contrib-python==4.8.1.78
 opencv-python==4.8.1.78
 streamlit==1.27.0
+
+wheel
+setuptools
+onnx2tf==1.15.15
+onnx2tf==1.0.6
+onnx==1.14.1
+onnxruntime==1.16.3
+# nvidia-pyindex
+# onnx-graphsurgeon
+onnxsim==0.4.33
+simple_onnx_processing_tools
+tensorflow==2.13.1
+protobuf==3.20.3
+h5py==3.7.0
+psutil==5.9.5
+ml_dtypes==0.2.0

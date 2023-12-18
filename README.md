@@ -19,24 +19,30 @@ In this post, you will learn the following,
 ### Setup
 - To create `environment`:
 ```bash
-conda create -n env
+conda create -n env python=3.8
 conda activate env
 pip install -r requirements.txt
+pip install nvidia-pyindex
+pip install onnx-graphsurgeon
 ```
+
+### Simple Demo
 - To run streamlit app:
 ```bash
 streamlit run app.py --server.port 8080
 ```
+
+### Export model
+- To export model to onnx
+```bash
+python3 export_onnx.py
+```
+
+- To export onnx to tflite
+```bash
+onnx2tf -i path/to/model.onnx -o saved_model
+```
+
 ### Document Scanner Application
 
 <img src = 'app_images/app_demo.png'>
-
-# AI Courses by OpenCV
-
-Want to become an expert in AI? [AI Courses by OpenCV](https://opencv.org/courses/) is a great place to start.
-
-<a href="https://opencv.org/courses/">
-<p align="center">
-<img src="https://learnopencv.com/wp-content/uploads/2023/01/AI-Courses-By-OpenCV-Github.png">
-</p>
-</a>

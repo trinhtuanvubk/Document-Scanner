@@ -2,3 +2,4 @@ Epay*
 *.zip
 **/*.pth
 *.onnx
+saved_model
