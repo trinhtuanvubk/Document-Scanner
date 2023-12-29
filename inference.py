@@ -232,29 +232,29 @@ if __name__ == "__main__":
     preprocess_transforms = image_preprocess_transforms()
     model = load_model(model_name="r50")
 
-    # convert onnx
-    image_path = "Epay_AI/IMG_20231214_104950.jpg"
-    image = cv2.imread(image_path)
-    h, w = image.shape[:2]
-    # IMAGE_SIZE = image_size
-    half = IMAGE_SIZE // 2
+    # # convert onnx
+    # image_path = "Epay_AI/IMG_20231214_104950.jpg"
+    # image = cv2.imread(image_path)
+    # h, w = image.shape[:2]
+    # # IMAGE_SIZE = image_size
+    # half = IMAGE_SIZE // 2
 
-    imH, imW, C = image.shape
+    # imH, imW, C = image.shape
 
-    image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_NEAREST)
+    # image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_NEAREST)
 
-    scale_x = imW / IMAGE_SIZE
-    scale_y = imH / IMAGE_SIZE
+    # scale_x = imW / IMAGE_SIZE
+    # scale_y = imH / IMAGE_SIZE
 
-    image_model = preprocess_transforms(image_model)
-    print(image_model.shape)
-    image_model = torch.unsqueeze(image_model, dim=0)
+    # image_model = preprocess_transforms(image_model)
+    # print(image_model.shape)
+    # image_model = torch.unsqueeze(image_model, dim=0)
 
-    torch.onnx.export(model, 
-                 image_model, 
-                 "res50.onnx", 
-                 verbose=True
-    )
+    # torch.onnx.export(model, 
+    #              image_model, 
+    #              "res50.onnx", 
+    #              verbose=True
+    # )
     
 
 

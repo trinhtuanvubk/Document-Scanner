@@ -31,7 +31,7 @@ class wrapModel(torch.nn.Module):
         out = self.model(input_image)
         out = out["out"]
         out = torch.argmax(out, dim=1, keepdims=True).permute(0, 2, 3, 1)[0].squeeze()
-        out = out.to(torch.int32)
+        out = out.to(torch.uint8)
         return out
         
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     IMAGE_SIZE = 384
     # model = load_model(model_name="mbv3")
     preprocess_transforms = image_preprocess_transforms()
-    model = load_model(model_name="r50")
+    model = load_model(model_name="mbv3")
     wrap = wrapModel(model)
 
     # convert onnx
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     torch.onnx.export(wrap, 
                  image_model, 
-                 "wrap_with_preprocess.onnx", 
+                 "mbv3_pre_wrap_uint8.onnx", 
                  input_names=['input'],
                  output_names=['output'],
                  verbose=True

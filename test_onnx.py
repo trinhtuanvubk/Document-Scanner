@@ -7,6 +7,23 @@ import numpy as np
 BUFFER = 10
 IMAGE_SIZE = 384
 
+def find_intersection(p1, p2, p3, p4):
+    x1, y1 = p1
+    x2, y2 = p2
+    x3, y3 = p3
+    x4, y4 = p4
+
+    m1 = (y2 - y1) / (x2 - x1) if (x2 - x1) != 0 else float('inf')
+    b1 = y1 - m1 * x1
+
+    m2 = (y4 - y3) / (x4 - x3) if (x4 - x3) != 0 else float('inf')
+    b2 = y3 - m2 * x3
+
+    x = (b2 - b1) / (m1 - m2) if (m1 - m2) != 0 else float('inf')
+    y = m1 * x + b1
+
+    return [int(x), int(y)]
+
 def order_points(pts):
     """Rearrange coordinates to order:
     top-left, top-right, bottom-right, bottom-left"""
@@ -52,19 +69,25 @@ common_transforms = torchvision_T.Compose(
         ]
     )
 
-image_path = "test_images/IMG_20220721_162811.jpg"
+image_path = "/home/aittgp/vutt/workspace/Document-Scanner/Epay_AI/IMG_20231214_110625.jpg"
+# image_path = "/home/aittgp/vutt/workspace/Document-Scanner/Epay_Output/IMG_20231214_110122.jpg"
+image_path = "/home/aittgp/vutt/workspace/Document-Scanner/Epay_AI/IMG_20231214_105544.jpg"
+# image_path = "./test3.jpg"
 image = cv2.imread(image_path)
 h, w = image.shape[:2]
 IMAGE_SIZE = 384
 # IMAGE_SIZE = image_size
 half = IMAGE_SIZE // 2
-
+print(half)
 imH, imW, C = image.shape
+print(image.shape)
 
 image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_NEAREST)
 
+cv2.imwrite("resize.jpg", image_model)
 scale_x = imW / IMAGE_SIZE
 scale_y = imH / IMAGE_SIZE
+print(f"scale: {scale_x}, {scale_y}")
 
 # for wrap.onnx
 # image_model = common_transforms(image_model)
@@ -77,7 +100,7 @@ print(image_model.dtype)
 
 
 # sess = onnxruntime.InferenceSession('./wrap.onnx',providers=['CPUExecutionProvider'])
-sess = onnxruntime.InferenceSession('./wrap_with_preprocess.onnx',providers=['CPUExecutionProvider'])
+sess = onnxruntime.InferenceSession('./mbv3_pre_wrap_uint8.onnx',providers=['CPUExecutionProvider'])
 
 inputs_name = [x.name for x in sess.get_inputs()]
 outputs_name = [x.name for x in sess.get_outputs()]
@@ -93,34 +116,45 @@ out = sess.run(outputs_name, {sess.get_inputs()[0].name: np.expand_dims(image_mo
 
 print(out)
 print(out.shape)
-
-
+# print(type(out))
+# print(out.dtype)
+# print("===============")
+# for o in out:
+#     print(o)
 # ==============================================================
 
 r_H, r_W = out.shape
 
+
 _out_extended = np.zeros((IMAGE_SIZE + r_H, IMAGE_SIZE + r_W), dtype=out.dtype)
+print(_out_extended.shape)
 _out_extended[half : half + IMAGE_SIZE, half : half + IMAGE_SIZE] = out * 255
 out = _out_extended.copy()
-
+cv2.imwrite("out.jpg", out)
 # Edge Detection.
 canny = cv2.Canny(out.astype(np.uint8), 225, 255)
 canny = cv2.dilate(canny, cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5)))
 contours, _ = cv2.findContours(canny, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+print(f"contours: {len(contours)}")
+print(contours[0].shape, contours[1].shape)
 page = sorted(contours, key=cv2.contourArea, reverse=True)[0]
-
+print(f"page: {page} {len(page)}")
 # ==========================================
 epsilon = 0.02 * cv2.arcLength(page, True)
+print(epsilon)
 corners = cv2.approxPolyDP(page, epsilon, True)
 
 corners = np.concatenate(corners).astype(np.float32)
-
+# print(f"coners {corners}, {corners.shape}")
 corners[:, 0] -= half
 corners[:, 1] -= half
+# print(f"coners {corners}, {corners.shape}")
 
 corners[:, 0] *= scale_x
 corners[:, 1] *= scale_y
 
+print(corners)
+# print(f"coners {corners}, {corners.shape}")
 # check if corners are inside.
 # if not find smallest enclosing box, expand_image then extract document
 # else extract document
@@ -128,11 +162,44 @@ corners[:, 1] *= scale_y
 if not (np.all(corners.min(axis=0) >= (0, 0)) and np.all(corners.max(axis=0) <= (imW, imH))):
 
     left_pad, top_pad, right_pad, bottom_pad = 10, 10, 10, 10
-
+    print("hihi")
+    print(corners.shape)
+    
+    print(corners.reshape((-1,1,2)).shape)
     rect = cv2.minAreaRect(corners.reshape((-1, 1, 2)))
+    print(f"rec: {rect}")
     box = cv2.boxPoints(rect)
     box_corners = np.int32(box)
+    print(f"box corners: {box_corners}")
     #     box_corners = minimum_bounding_rectangle(corners)
+    vutt_corners = box_corners.tolist()
+    print(vutt_corners)
+    epsilon = 1
+    for i, cor in enumerate(vutt_corners):
+        print(f"cor: {cor}")
+        if not(0-epsilon < cor[0] < imW+epsilon):
+            # print("wrh")
+            out_point = cor
+            print((i-1)%len(vutt_corners), (i+1%len(vutt_corners)))
+            left_point, right_point = vutt_corners[(i-1)%len(vutt_corners)], vutt_corners[(i+1)%len(vutt_corners)]
+            intersec1 = find_intersection(left_point, out_point, [imW, 0], [imW, 3000])
+            intersec2 = find_intersection(right_point, out_point, [imW, 0], [imW, 3000])
+            vutt_corners.remove(out_point)
+            vutt_corners.append(intersec1)
+            vutt_corners.append(intersec2)
+        
+        if not(0-epsilon <= cor[1] < imH+epsilon):
+            out_point = cor
+            print((i-1)%len(vutt_corners), (i+1%len(vutt_corners)))
+            left_point, right_point = vutt_corners[(i-1)%len(vutt_corners)], vutt_corners[(i+1)%len(vutt_corners)]
+            intersec1 = find_intersection(left_point, out_point, [0, imH], [3000, imH])
+            intersec2 = find_intersection(right_point, out_point, [0, imH], [3000, imH])
+            vutt_corners.remove(out_point)
+            vutt_corners.append(intersec1)
+            vutt_corners.append(intersec2)
+            
+            
+
 
     box_x_min = np.min(box_corners[:, 0])
     box_x_max = np.max(box_corners[:, 0])
@@ -168,11 +235,21 @@ if not (np.all(corners.min(axis=0) >= (0, 0)) and np.all(corners.max(axis=0) <= 
     corners = box_corners
     image = image_extended
 
+print(corners.shape)
+temp_img = image
 corners = sorted(corners.tolist())
 corners = order_points(corners)
-destination_corners = find_dest(corners)
-M = cv2.getPerspectiveTransform(np.float32(corners), np.float32(destination_corners))
+print(f"vutt: {vutt_corners}")
 
+
+for point in vutt_corners:
+    cv2.circle(temp_img, point, 5, (0, 255, 0), -1)  # -1 for filled circle
+    cv2.imwrite("circle.jpg", temp_img)
+destination_corners = find_dest(corners)
+print(f"des: {destination_corners}")
+M = cv2.getPerspectiveTransform(np.float32(corners), np.float32(destination_corners))
+print(f"des: {destination_corners}")
+print(M)
 final = cv2.warpPerspective(image, M, (destination_corners[2][0], destination_corners[2][1]), flags=cv2.INTER_LANCZOS4)
 final = np.clip(final, a_min=0, a_max=255)
 final = final.astype(np.uint8)
