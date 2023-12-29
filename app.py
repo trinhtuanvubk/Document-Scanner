@@ -214,7 +214,7 @@ result = None
 
 st.set_page_config(initial_sidebar_state="collapsed")
 
-st.title("Document Scanner: Semantic Segmentation using DeepLabV3-PyTorch")
+st.title("Document Scanner: Semantic Segmentation")
 
 uploaded_file = st.file_uploader("Upload Document Image :", type=["png", "jpg", "jpeg"])
 
