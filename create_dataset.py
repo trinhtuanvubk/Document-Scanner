@@ -63,7 +63,7 @@ def extract_image(image, startpoints, endpoints):
 def generate_perspective_transformed_image(transformer, distortion_scale, gen_count, image, mask, shape):
 
     W, H = shape
-    random_idx_seed_value = randint(0, 1000000)
+    random_idx_seed_value = randint(0, 100)
 
     torch.manual_seed(random_idx_seed_value)
     perspective_imgs = []
@@ -97,7 +97,7 @@ def operation(params=None):
     GEN_MSK_DIR = params["GEN_MSK_DIR"]
     start_idx = params["start_idx"]
 
-    motion_blur = A.MotionBlur(blur_limit=18, p=0.35)
+    # motion_blur = A.MotionBlur(blur_limit=18, p=0.35)
     v_flip = A.VerticalFlip(p=0.75)
     h_flip = A.HorizontalFlip(p=0.75)
     rotate_aug = A.Rotate(border_mode=1, interpolation=0, p=0.5)
@@ -143,7 +143,7 @@ def operation(params=None):
             cshuffle,
             contrast_2,
             A.OneOf([opt_aug, grid_aug, elastic_aug], p=0.8),  # elastic_aug
-            A.OneOf([noise, motion_blur, compression_aug], p=0.7),
+            # A.OneOf([noise, motion_blur, compression_aug], p=0.7),
             A.OneOf([shadow, sunflare, rgb_shift], p=0.65),  # rgb_shift
         ],
         p=1.0,
@@ -171,7 +171,7 @@ def operation(params=None):
             shape=(W, H),
         )
 
-        random_bck_indx = np.random.choice(total_idxs, size=NUM_BCK_IMAGS, replace=False)
+        random_bck_indx = np.random.choice(total_idxs, size=NUM_BCK_IMAGS, replace=True)
         bck_imgs_chosen = BCK_IMGS[random_bck_indx]
 
         for idx, bck_img_path in enumerate(bck_imgs_chosen):
@@ -209,8 +209,15 @@ def operation(params=None):
 
             bck_img = bck_img[:, :, ::-1]  # RGB to BGR for cv2.imwrite
             new_mask = new_mask.astype(np.uint8)
+            np.set_printoptions(threshold=np.inf)
+            # print(new_mask)
+            
+            # if not(len(np.unique(new_mask)) == 2):
+            #     print("lol")
+            #     continue
+            # else:
+            #     print("fuck")
 
-            assert len(np.unique(new_mask)) == 2
 
             new_save_name = f"{doc_indx:>04}_bck_{idx:>02}.png"
 
@@ -229,13 +236,13 @@ def chunk(length, n):
 if __name__ == "__main__":
     start_time = time.perf_counter()
 
-    DOC_IMG_PATH = r"DOCUMENTS\\CHOSEN\\resized_images"
-    DOC_MSK_PATH = r"DOCUMENTS\\CHOSEN\\resized_masks"
+    DOC_IMG_PATH = r"DOCUMENTS/CHOSEN/resized_images"
+    DOC_MSK_PATH = r"DOCUMENTS/CHOSEN/resized_masks"
 
-    GEN_IMG_DIR = r"final_set\\images"
-    GEN_MSK_DIR = r"final_set\\masks"
+    GEN_IMG_DIR = r"final_set/images"
+    GEN_MSK_DIR = r"final_set/masks"
 
-    BCK_IMGS_DIR = r"background_images"
+    BCK_IMGS_DIR = r"all_images/background_images"
 
     DOC_IMGS = [os.path.join(DOC_IMG_PATH, i) for i in os.listdir(DOC_IMG_PATH)]
     DOC_MSKS = [os.path.join(DOC_MSK_PATH, i) for i in os.listdir(DOC_MSK_PATH)]

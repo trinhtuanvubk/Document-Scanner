@@ -25,6 +25,25 @@ pip install -r requirements.txt
 pip install nvidia-pyindex
 pip install onnx-graphsurgeon
 ```
+### Create dataset
+
+- Download raw scroped dataset and background
+
+- To gen full mask
+```bash
+python3 generate_doc_set.py
+```
+
+- To resize
+```bash
+python3 resizer.py -s DOCUMENTS/CHOSEN/images -d DOCUMENTS/CHOSEN/resized_images -x 640
+python3 resizer.py -s DOCUMENTS/CHOSEN/masks -d DOCUMENTS/CHOSEN/resized_masks -x 640
+```
+
+- To gen data
+```bash
+python3 create_dataset.py
+```
 
 ### Simple Demo
 - To run streamlit app:

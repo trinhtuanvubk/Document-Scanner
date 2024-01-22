@@ -79,7 +79,9 @@ def transform_images_xmls(source_dir, dest_dir, image_size=320):
     images_paths = [i for i in os.listdir(SRC_DIR) if i.endswith(IMAGE_FORMATS)]
 
     length = len(images_paths)
+    print(length)
     procs = cpu_count()
+    print(procs)
     # procIDs = list(range(procs))
     print("Procs:", procs)
 

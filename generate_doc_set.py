@@ -7,19 +7,14 @@ import numpy as np
 np.random.seed(42)
 random.seed(42)
 
-DST_IMG_DIR = r"DOCUMENTS\\CHOSEN\\images"
-DST_MSK_DIR = r"DOCUMENTS\\CHOSEN\\masks"
+DST_IMG_DIR = r"DOCUMENTS/CHOSEN/images"
+DST_MSK_DIR = r"DOCUMENTS/CHOSEN/masks"
 
 os.makedirs(DST_IMG_DIR, exist_ok=True)
 os.makedirs(DST_MSK_DIR, exist_ok=True)
 
 datasets = {
-    r"DOCUMENTS\\datasets\\docvqa_images": 700,  # 2573
-    r"DOCUMENTS\\datasets\\formsE-H_images": 100,  # 522
-    r"DOCUMENTS\\datasets\\kaggle_noisy_images": 125,  # 360
-    r"DOCUMENTS\\datasets\\FUNSD_images": 199,  # 199
-    r"DOCUMENTS\\datasets\\nouvel_images": 125,  # 125
-    r"DOCUMENTS\\datasets\\annotated_640": 94,  # 94
+    "all_images/images": 129,  # 2573
 }
 
 

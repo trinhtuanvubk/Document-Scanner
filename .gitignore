@@ -1,5 +1,5 @@
 Epay*
 *.zip
 **/*.pth
-*.onnx
+onnx/*
 saved_*
