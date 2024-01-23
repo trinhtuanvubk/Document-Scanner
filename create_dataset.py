@@ -108,49 +108,50 @@ def operation(params=None):
     if random() > 0.5:
         value = (255, 255, 255)
 
-    opt_aug = A.OpticalDistortion(distort_limit=0.28, interpolation=0, border_mode=0, value=value, mask_value=0, p=0.9)
-    grid_aug = A.GridDistortion(num_steps=2, distort_limit=(-0.22, 0.35), interpolation=0, border_mode=0, value=value, mask_value=0, p=0.9)
-    elastic_aug = A.ElasticTransform(alpha=150, sigma=13, alpha_affine=10, interpolation=0, border_mode=0, value=value, mask_value=0, p=0.9)
+    opt_aug = A.OpticalDistortion(distort_limit=0.28, interpolation=0, border_mode=0, value=value, mask_value=0, p=0.5)
+    grid_aug = A.GridDistortion(num_steps=2, distort_limit=(-0.22, 0.35), interpolation=0, border_mode=0, value=value, mask_value=0, p=0.5)
+    elastic_aug = A.ElasticTransform(alpha=150, sigma=13, alpha_affine=10, interpolation=0, border_mode=0, value=value, mask_value=0, p=0.5)
 
     # One of
-    compression_aug = A.ImageCompression(quality_lower=30, quality_upper=80, p=1.0)
+    compression_aug = A.ImageCompression(quality_lower=30, quality_upper=70, p=1.0)
     # downscale_aug = A.Downscale(p=1.0)
-    noise = A.ISONoise(color_shift=(0.05, 0.25), p=0.75)
+    noise = A.ISONoise(color_shift=(0.05, 0.25), p=0.50)
 
     # One of
-    shadow = A.RandomShadow(shadow_roi=(0.0, 0.0, 1.0, 1.0), num_shadows_lower=0, num_shadows_upper=1, shadow_dimension=3, p=0.7)
+    shadow = A.RandomShadow(shadow_roi=(0.0, 0.0, 1.0, 1.0), num_shadows_lower=0, num_shadows_upper=1, shadow_dimension=3, p=0.6)
     sunflare = A.RandomSunFlare(
         flare_roi=(0.0, 0.0, 1.0, 1.0),
         angle_lower=0,
         angle_upper=1,
         num_flare_circles_lower=6,
         num_flare_circles_upper=10,
-        src_radius=200,
+        src_radius=100,
         src_color=(255, 255, 255),
-        p=0.6,
+        p=0.5,
     )
 
-    rgb_shift = A.RGBShift(r_shift_limit=20, g_shift_limit=0, b_shift_limit=10, p=0.4)
-    cshuffle = A.ChannelShuffle(p=0.6)
+    rgb_shift = A.RGBShift(r_shift_limit=10, g_shift_limit=0, b_shift_limit=10, p=0.6)
+    cshuffle = A.ChannelShuffle(p=0.8)
     contrast = A.RandomBrightnessContrast(contrast_limit=(0.1, 0.34), p=0.5)
-    contrast_2 = A.RandomBrightnessContrast(p=0.5)
+    contrast_2 = A.RandomBrightnessContrast(p=0.6)
 
     augs = A.Compose(
         [
-            A.OneOf([v_flip, h_flip], p=0.8),
-            rotate_aug,
+            A.OneOf([v_flip, h_flip], p=0.6),
+            # rotate_aug,
             color_J,
             cshuffle,
             contrast_2,
-            A.OneOf([opt_aug, grid_aug, elastic_aug], p=0.8),  # elastic_aug
+            # A.OneOf([opt_aug, grid_aug, elastic_aug], p=0.4),  # elastic_aug
+            A.MotionBlur(p=0.5),
             # A.OneOf([noise, motion_blur, compression_aug], p=0.7),
-            A.OneOf([shadow, sunflare, rgb_shift], p=0.65),  # rgb_shift
+            A.OneOf([shadow, sunflare, rgb_shift], p=0.4),  # rgb_shift
         ],
         p=1.0,
     )
 
-    distortion_scale = 0.55
-    perspective_transformer = T.RandomPerspective(distortion_scale=distortion_scale, p=0.7, interpolation=T.InterpolationMode.NEAREST)
+    distortion_scale = 0.5
+    perspective_transformer = T.RandomPerspective(distortion_scale=distortion_scale, p=0.6, interpolation=T.InterpolationMode.NEAREST)
 
     NUM_BCK_IMAGS = 6
     total_idxs = np.arange(0, len(BCK_IMGS))
@@ -187,7 +188,7 @@ def operation(params=None):
             height, width = doc_img.shape[0], doc_img.shape[1]
 
             # Random resize background image
-            new_h, new_w = get_random_size(height, width, factor=(1.1, 1.4))
+            new_h, new_w = get_random_size(height, width, factor=(1.1, 1.3))
             bck_img = cv2.resize(bck_img, (new_w, new_h), cv2.INTER_CUBIC)
 
             # Random location in the background image
@@ -219,7 +220,7 @@ def operation(params=None):
             #     print("fuck")
 
 
-            new_save_name = f"{doc_indx:>04}_bck_{idx:>02}.png"
+            new_save_name = f"{doc_indx:>04}_bck_{idx:>02}_low_quality_big.png"
 
             cv2.imwrite(os.path.join(GEN_IMG_DIR, new_save_name), bck_img)
             cv2.imwrite(os.path.join(GEN_MSK_DIR, new_save_name), new_mask)
@@ -242,7 +243,7 @@ if __name__ == "__main__":
     GEN_IMG_DIR = r"final_set/images"
     GEN_MSK_DIR = r"final_set/masks"
 
-    BCK_IMGS_DIR = r"all_images/background_images"
+    BCK_IMGS_DIR = r"all_images/simple_background"
 
     DOC_IMGS = [os.path.join(DOC_IMG_PATH, i) for i in os.listdir(DOC_IMG_PATH)]
     DOC_MSKS = [os.path.join(DOC_MSK_PATH, i) for i in os.listdir(DOC_MSK_PATH)]

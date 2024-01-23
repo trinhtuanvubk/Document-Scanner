@@ -6,18 +6,18 @@ import numpy as np
 
 np.random.seed(1)
 
-og_img_dir = r"final_set\\images"
-og_msk_dir = r"final_set\\masks"
+og_img_dir = r"final_set/images"
+og_msk_dir = r"final_set/masks"
 
 # Saving resized images to reduce file size
 MAX_DIM_SIZE = 480
 img_per_doc = 6
 
-train_img_dir = r"document_dataset_resized\\train\\images"
-train_msk_dir = r"document_dataset_resized\\train\\masks"
+train_img_dir = r"document_dataset_resized/train/images"
+train_msk_dir = r"document_dataset_resized/train/masks"
 
-valid_img_dir = r"document_dataset_resized\\valid\\images"
-valid_msk_dir = r"document_dataset_resized\\valid\\masks"
+valid_img_dir = r"document_dataset_resized/valid/images"
+valid_msk_dir = r"document_dataset_resized/valid/masks"
 
 os.makedirs(train_img_dir, exist_ok=True)
 os.makedirs(train_msk_dir, exist_ok=True)

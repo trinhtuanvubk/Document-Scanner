@@ -40,7 +40,7 @@ python3 resizer.py -s DOCUMENTS/CHOSEN/images -d DOCUMENTS/CHOSEN/resized_images
 python3 resizer.py -s DOCUMENTS/CHOSEN/masks -d DOCUMENTS/CHOSEN/resized_masks -x 640
 ```
 
-- To gen data
+- To gen data (fix factor to change the ratio of image size and background size)
 ```bash
 python3 create_dataset.py
 ```

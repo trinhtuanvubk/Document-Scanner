@@ -16,7 +16,8 @@ from torchvision.models.segmentation import deeplabv3_resnet50, deeplabv3_mobile
 def load_model(num_classes=2, model_name="mbv3", device=torch.device("cpu")):
     if model_name == "mbv3":
         model = deeplabv3_mobilenet_v3_large(num_classes=num_classes, aux_loss=True)
-        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
+        # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
+        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_ft.pth")
     else:
         model = deeplabv3_resnet50(num_classes=num_classes, aux_loss=True)
         checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_r50_iou_mix_2C020.pth")
@@ -225,12 +226,12 @@ def enhance_text_filter2D(image_path):
 
 if __name__ == "__main__":
     data_path = "./Epay_AI"
-    output_path = "./Epay_Output"
+    output_path = "./Epay_Output_ft"
     os.makedirs(output_path, exist_ok=True)
     IMAGE_SIZE = 384
-    # model = load_model(model_name="mbv3")
+    model = load_model(model_name="mbv3")
     preprocess_transforms = image_preprocess_transforms()
-    model = load_model(model_name="r50")
+    # model = load_model(model_name="")
 
     # # convert onnx
     # image_path = "Epay_AI/IMG_20231214_104950.jpg"
@@ -268,7 +269,7 @@ if __name__ == "__main__":
         final = scan(image_true=image, trained_model=model, image_size=IMAGE_SIZE)
         # final = apply_enhancements(final)
         cv2.imwrite(outfile_path, final)
-        break
+        # break
 
 
 

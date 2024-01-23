@@ -14,7 +14,7 @@ os.makedirs(DST_IMG_DIR, exist_ok=True)
 os.makedirs(DST_MSK_DIR, exist_ok=True)
 
 datasets = {
-    "all_images/images": 129,  # 2573
+    "all_images/simple_images": 97,  # 2573
 }
 
 
