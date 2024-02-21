@@ -15,10 +15,11 @@ from torchvision.models.segmentation import deeplabv3_resnet50, deeplabv3_mobile
 
 def load_model(model_name="mbv3", checkpoint_path="", device=torch.device("cpu"), num_classes=2):
     if model_name == "mbv3":
+        # print(hihi)
         model = deeplabv3_mobilenet_v3_large(num_classes=num_classes, aux_loss=True)
         # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
         # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "mbv3_averaged_averaged.pth")
-    elif model_name=='resnet50':
+    elif model_name=='res50':
         model = deeplabv3_resnet50(num_classes=num_classes, aux_loss=True)
         # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "res50_15k.pth")
     else:
@@ -81,7 +82,7 @@ def find_dest(pts):
 
 
 def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10):
-    global preprocess_transforms
+    preprocess_transforms = image_preprocess_transforms()
 
     IMAGE_SIZE = image_size
     half = IMAGE_SIZE // 2
@@ -229,7 +230,7 @@ def infer(args):
     model = load_model(args.backbone_model, args.checkpoint_path, args.device)
     preprocess_transforms = image_preprocess_transforms()
 
-    if os.path.isfile(data_path):
+    if os.path.isfile(args.data_infer):
         # basename = data_path.rsplit("/",1)[-1].rsplit(".",1)[0]
         outfile_path = f"output_test.jpg"
         image = cv2.imread(filepath)
@@ -239,13 +240,13 @@ def infer(args):
         cv2.imwrite(outfile_path, final)
 
     else:
-        for file in os.listdir(data_path):
-            filepath = os.path.join(data_path, file)
-            outfile_path = os.path.join(output_path, file)
+        for file in os.listdir(args.data_infer):
+            filepath = os.path.join(args.data_infer, file)
+            outfile_path = os.path.join(args.data_result, file)
             # print(filepath)
-            print(output_path)
+            # print(output_path)
             image = cv2.imread(filepath)
             h, w = image.shape[:2]
-            final = scan(image_true=image, trained_model=model, image_size=IMAGE_SIZE)
+            final = scan(image_true=image, trained_model=model, image_size=args.image_size)
             # final = apply_enhancements(final)
             cv2.imwrite(outfile_path, final)

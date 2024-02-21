@@ -46,6 +46,8 @@ def get_args():
 
     # infer
     parser.add_argument("--data_infer", type=str, default="./test_AI")
+    parser.add_argument("--data_result", type=str, default="./output_test_AI")
+    
     parser.add_argument("--image_size", type=int, default=384)
 
     # params
