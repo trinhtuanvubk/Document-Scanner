@@ -81,7 +81,7 @@ def find_dest(pts):
     return order_points(destination_corners)
 
 
-def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10):
+def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10, device=None):
     preprocess_transforms = image_preprocess_transforms()
 
     IMAGE_SIZE = image_size
@@ -96,7 +96,7 @@ def scan(image_true=None, trained_model=None, image_size=384, BUFFER=10):
 
     image_model = preprocess_transforms(image_model)
     print(image_model.shape)
-    image_model = torch.unsqueeze(image_model, dim=0)
+    image_model = torch.unsqueeze(image_model, dim=0).to(device)
 
     with torch.no_grad():
         out = trained_model(image_model)
@@ -247,6 +247,6 @@ def infer(args):
             # print(output_path)
             image = cv2.imread(filepath)
             h, w = image.shape[:2]
-            final = scan(image_true=image, trained_model=model, image_size=args.image_size)
+            final = scan(image_true=image, trained_model=model, image_size=args.image_size, device=args.device)
             # final = apply_enhancements(final)
             cv2.imwrite(outfile_path, final)
