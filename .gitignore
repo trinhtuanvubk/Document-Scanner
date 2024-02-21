@@ -3,3 +3,6 @@ Epay*
 **/*.pth
 onnx/*
 saved_*
+*.onnx
+*.ipynb
+*.md
