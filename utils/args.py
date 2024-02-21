@@ -9,9 +9,6 @@ def get_args():
     # parser.add_argument('--scenario', type=str, default='test_output_model')
     parser.add_argument('--scenario', type=str, default='train')
 
-    parser.add_argument('--model-base', type=str, default='mbnv3')
-    parser.add_argument('--pretrain_dir', type=str, default='SVTR_pretrained_large_2810')
-    parser.add_argument('--ckpt_dir', type=str, default='SVTR_finetuned_vilage_short_1111')
     # generate doc set
     parser.add_argument('--dst_img_dir', type=str, default="DOCUMENTS/CHOSEN/images")
     parser.add_argument('--dst_msk_dir', type=str, default="DOCUMENTS/CHOSEN/masks")
@@ -51,7 +48,7 @@ def get_args():
     parser.add_argument("--data_infer", type=str, default="./test_AI")
     parser.add_argument("--image_size", type=int, default=384)
 
-
+    # params
     parser.add_argument('--learning_rate', type=float, default=0.0001)
     parser.add_argument('--optimizer', type=str, default='adam')
     parser.add_argument('--weight_decay', type=float, default=0.05)
