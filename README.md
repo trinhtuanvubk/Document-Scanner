@@ -23,26 +23,46 @@ pip install onnx-graphsurgeon
 
 - To gen full mask
 ```bash
-python3 generate_doc_set.py
+python3 main.py --scenario generate_doc_set
 ```
 
 - To resize
 ```bash
-python3 resizer.py -s DOCUMENTS/CHOSEN/images -d DOCUMENTS/CHOSEN/resized_images -x 640
-python3 resizer.py -s DOCUMENTS/CHOSEN/masks -d DOCUMENTS/CHOSEN/resized_masks -x 640
+python3 main.py --scenario resizer \
+-s DOCUMENTS/CHOSEN/images \
+-d DOCUMENTS/CHOSEN/resized_images 
+-x 640
 ```
 
-- To gen data (fix factor to change the ratio of image size and background size)
 ```bash
-python3 create_dataset.py
+python3 main.py --scenraio resizer \
+-s DOCUMENTS/CHOSEN/masks \
+-d DOCUMENTS/CHOSEN/resized_masks \
+-x 640
 ```
 
-### Simple Demo
-- To run streamlit app:
+- To gen data (config factor to change the ratio of image size and background size)
 ```bash
-streamlit run app.py --server.port 8080
+python3 main.py --scenario create_dataset
 ```
 
+### Train
+- To train:
+```bash
+python3 main.py --scenario train \
+--backbone_model "mbv3" \
+--data_dir "document_dataset_resized" \
+--batch_size 32 \
+--num_epoch 100
+```
+
+### Inference
+- To infer:
+```bash
+python3 main.py --scenario infer \
+--data_infer "./test_images/IMG_20220721_162757.jpg" \
+--image_size 384
+```
 ### Export model
 - To export model to onnx
 ```bash
@@ -57,3 +77,10 @@ onnx2tf -i path/to/model.onnx -o saved_model
 ### Document Scanner Application
 
 <img src = 'app_images/app_demo.png'> -->
+
+
+### Simple Demo
+- To run streamlit app:
+```bash
+streamlit run app.py --server.port 8080
+```
