@@ -12,6 +12,25 @@ import torchvision.transforms as torchvision_T
 from torchvision.models.segmentation import deeplabv3_resnet50, deeplabv3_mobilenet_v3_large
 
 
+
+def load_model(model_name="mbv3", checkpoint_path="", device=torch.device("cpu"), num_classes=2):
+    if model_name == "mbv3":
+        model = deeplabv3_mobilenet_v3_large(num_classes=num_classes, aux_loss=True)
+        # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
+        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "mbv3_averaged_averaged.pth")
+    else:
+        model = deeplabv3_resnet50(num_classes=num_classes, aux_loss=True)
+        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "res50_15k.pth")
+
+    model.to(device)
+    checkpoints = torch.load(checkpoint_path, map_location=device)
+    model.load_state_dict(checkpoints, strict=False)
+    model.eval()
+
+    _ = model(torch.randn((1, 3, 384, 384)))
+
+    return model
+
 def image_preprocess_transforms(mean=(0.4611, 0.4359, 0.3905), std=(0.2193, 0.2150, 0.2109)):
     common_transforms = torchvision_T.Compose(
         [
@@ -205,52 +224,27 @@ def enhance_text_filter2D(image_path):
     return enhanced_image
 
 
-if __name__ == "__main__":
-    data_path = "./Epay_AI"
-    output_path = "./Epay_Output_ft"
-    os.makedirs(output_path, exist_ok=True)
-    IMAGE_SIZE = 384
-    model = load_model(model_name="mbv3")
+def infer(args):
+    model = load_model(args.backbone_model, args.checkpoint_path, args.device)
     preprocess_transforms = image_preprocess_transforms()
-    # model = load_model(model_name="")
 
-    # # convert onnx
-    # image_path = "Epay_AI/IMG_20231214_104950.jpg"
-    # image = cv2.imread(image_path)
-    # h, w = image.shape[:2]
-    # # IMAGE_SIZE = image_size
-    # half = IMAGE_SIZE // 2
-
-    # imH, imW, C = image.shape
-
-    # image_model = cv2.resize(image, (IMAGE_SIZE, IMAGE_SIZE), interpolation=cv2.INTER_NEAREST)
-
-    # scale_x = imW / IMAGE_SIZE
-    # scale_y = imH / IMAGE_SIZE
-
-    # image_model = preprocess_transforms(image_model)
-    # print(image_model.shape)
-    # image_model = torch.unsqueeze(image_model, dim=0)
-
-    # torch.onnx.export(model, 
-    #              image_model, 
-    #              "res50.onnx", 
-    #              verbose=True
-    # )
-    
-
-
-    for file in os.listdir(data_path):
-        filepath = os.path.join(data_path, file)
-        outfile_path = os.path.join(output_path, file)
-        # print(filepath)
-        print(output_path)
+    if os.path.isfile(data_path):
+        # basename = data_path.rsplit("/",1)[-1].rsplit(".",1)[0]
+        outfile_path = f"output_test.jpg"
         image = cv2.imread(filepath)
         h, w = image.shape[:2]
-        final = scan(image_true=image, trained_model=model, image_size=IMAGE_SIZE)
+        final = scan(image_true=image, trained_model=model, image_size=args.image_size)
         # final = apply_enhancements(final)
         cv2.imwrite(outfile_path, final)
-        # break
 
-
-
+    else:
+        for file in os.listdir(data_path):
+            filepath = os.path.join(data_path, file)
+            outfile_path = os.path.join(output_path, file)
+            # print(filepath)
+            print(output_path)
+            image = cv2.imread(filepath)
+            h, w = image.shape[:2]
+            final = scan(image_true=image, trained_model=model, image_size=IMAGE_SIZE)
+            # final = apply_enhancements(final)
+            cv2.imwrite(outfile_path, final)

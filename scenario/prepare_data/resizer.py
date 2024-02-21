@@ -114,14 +114,7 @@ def transform_images_xmls(source_dir, dest_dir, image_size=320):
     print("[INFO] multiprocessing complete")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Create Training and Validatin splits")
-    parser.add_argument("-s", "--source-dir", required=True, type=str, help="Input Source folder path")
-    parser.add_argument("-d", "--destination-dir", required=True, type=str, help="Output destination folder path")
-    parser.add_argument("-x", "--img-size", required=True, type=int, help="size of resized Image ")
-
-    args = parser.parse_args()
-
+def resizer(args):
     src = args.source_dir
     dst = args.destination_dir
     image_size = args.img_size
@@ -130,9 +123,5 @@ def main():
 
     transform_images_xmls(src, dst, image_size=image_size)
     print("\nTime Taken: ", round(time.perf_counter() - start, 3), "s")
-
-
-if __name__ == "__main__":
-    main()
 
 

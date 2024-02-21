@@ -234,24 +234,16 @@ def chunk(length, n):
         yield (i, i + n)
 
 
-if __name__ == "__main__":
+def create_data_set(args):
     start_time = time.perf_counter()
 
-    DOC_IMG_PATH = r"DOCUMENTS/CHOSEN/resized_images"
-    DOC_MSK_PATH = r"DOCUMENTS/CHOSEN/resized_masks"
+    DOC_IMGS = [os.path.join(args.doc_img_path, i) for i in os.listdir(args.doc_img_path)]
+    DOC_MSKS = [os.path.join(args.doc_msk_path, i) for i in os.listdir(args.doc_msk_path)]
 
-    GEN_IMG_DIR = r"final_set/images"
-    GEN_MSK_DIR = r"final_set/masks"
+    BCK_IMGS = np.asarray([os.path.join(args.brg_img_dir, i) for i in os.listdir(args.brg_img_dir)])
 
-    BCK_IMGS_DIR = r"all_images/simple_background"
-
-    DOC_IMGS = [os.path.join(DOC_IMG_PATH, i) for i in os.listdir(DOC_IMG_PATH)]
-    DOC_MSKS = [os.path.join(DOC_MSK_PATH, i) for i in os.listdir(DOC_MSK_PATH)]
-
-    BCK_IMGS = np.asarray([os.path.join(BCK_IMGS_DIR, i) for i in os.listdir(BCK_IMGS_DIR)])
-
-    os.makedirs(GEN_IMG_DIR, exist_ok=True)
-    os.makedirs(GEN_MSK_DIR, exist_ok=True)
+    os.makedirs(args.gen_img_dir, exist_ok=True)
+    os.makedirs(args.gen_msk_dir, exist_ok=True)
 
     length = len(DOC_IMGS)
     procs = max(cpu_count() - 4, 2)
