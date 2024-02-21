@@ -234,7 +234,7 @@ def chunk(length, n):
         yield (i, i + n)
 
 
-def create_data_set(args):
+def create_dataset(args):
     start_time = time.perf_counter()
 
     DOC_IMGS = [os.path.join(args.doc_img_path, i) for i in os.listdir(args.doc_img_path)]
