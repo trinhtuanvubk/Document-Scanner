@@ -5,31 +5,12 @@ import cv2
 import base64
 import pathlib
 import numpy as np
-from PIL import Image
-import streamlit as st
-from streamlit_drawable_canvas import st_canvas
+
 
 import torch
 import torchvision.transforms as torchvision_T
 from torchvision.models.segmentation import deeplabv3_resnet50, deeplabv3_mobilenet_v3_large
 
-def load_model(num_classes=2, model_name="mbv3", device=torch.device("cpu")):
-    if model_name == "mbv3":
-        model = deeplabv3_mobilenet_v3_large(num_classes=num_classes, aux_loss=True)
-        # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
-        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_ft.pth")
-    else:
-        model = deeplabv3_resnet50(num_classes=num_classes, aux_loss=True)
-        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_r50_iou_mix_2C020.pth")
-
-    model.to(device)
-    checkpoints = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoints, strict=False)
-    model.eval()
-
-    _ = model(torch.randn((1, 3, 384, 384)))
-
-    return model
 
 def image_preprocess_transforms(mean=(0.4611, 0.4359, 0.3905), std=(0.2193, 0.2150, 0.2109)):
     common_transforms = torchvision_T.Compose(
