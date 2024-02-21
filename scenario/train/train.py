@@ -10,7 +10,7 @@ from torchvision.utils import make_grid, save_image
 from torchmetrics import MeanMetric
 from livelossplot import PlotLosses
 
-from dataloader.dataloader import get_dataset, DeviceDataLoader
+from dataloader import get_dataset, DeviceDataLoader
 from nnet.model import prepare_model
 from nnet.loss import Loss, Metric
 from utils.args import get_args

@@ -17,17 +17,18 @@ def load_model(model_name="mbv3", checkpoint_path="", device=torch.device("cpu")
     if model_name == "mbv3":
         model = deeplabv3_mobilenet_v3_large(num_classes=num_classes, aux_loss=True)
         # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "model_mbv3_iou_mix_2C049.pth")
-        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "mbv3_averaged_averaged.pth")
-    else:
+        # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "mbv3_averaged_averaged.pth")
+    elif model_name=='resnet50':
         model = deeplabv3_resnet50(num_classes=num_classes, aux_loss=True)
-        checkpoint_path = os.path.join(os.getcwd(), "model_repository", "res50_15k.pth")
-
+        # checkpoint_path = os.path.join(os.getcwd(), "model_repository", "res50_15k.pth")
+    else:
+        print("Wrong Path")
     model.to(device)
     checkpoints = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoints, strict=False)
     model.eval()
 
-    _ = model(torch.randn((1, 3, 384, 384)))
+    # _ = model(torch.randn((1, 3, 384, 384)))
 
     return model
 

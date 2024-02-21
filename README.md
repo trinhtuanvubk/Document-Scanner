@@ -61,7 +61,8 @@ python3 main.py --scenario train \
 ```bash
 python3 main.py --scenario infer \
 --data_infer "./test_images/IMG_20220721_162757.jpg" \
---image_size 384
+--image_size 384 \
+--checkpoint_path "/home/aittgp/vutt/workspace/Document-Scanner/model_repository/res50_15k.pth"
 ```
 ### Export model
 - To export model to onnx
