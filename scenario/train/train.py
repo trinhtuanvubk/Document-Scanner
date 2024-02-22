@@ -25,17 +25,17 @@ def seed_everything(seed_value):
 class Trainer:
     def __init__(self, args):
         self.args = args
-        self.model = prepare_model(backbone_model=args.backbone_model, num_classes=args.num_class)
+        self.model = prepare_model(args)
         self.model.to(args.device)
 
-        train_loader, valid_loader = get_dataset(data_directory=DATA_DIR, batch_size=BATCH_SIZE)
-        self.train_loader = DeviceDataLoader(train_loader, args.device)
-        self.valid_loader = DeviceDataLoader(valid_loader, args.device)
+        train_loader, valid_loader = get_dataset(args)
+        self.train_loader = DeviceDataLoader(train_loader, args)
+        self.valid_loader = DeviceDataLoader(valid_loader, args)
 
         # metric_name = "iou"
         use_dice = True if args.metric_name == "dice" else False 
-        self.metric_fn = Metric(num_classes=NUM_CLASSES, use_dice=use_dice).to(args.device)
-        self.loss_fn = Loss(use_dice=use_dice).to(args.device)
+        self.metric = Metric(args, use_dice=use_dice).to(args.device)
+        self.loss = Loss(use_dice=use_dice).to(args.device)
 
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=0.0001)
 
@@ -63,14 +63,14 @@ class Trainer:
                 with torch.no_grad():
                     preds = self.model(data[0])["out"].detach()
 
-            loss = self.loss_fn(preds, data[1])
+            loss = self.loss(preds, data[1])
 
             if is_train:
-                self.optimizer_fn.zero_grad()
-                self.loss.backward()
-                self.optimizer_fn.step()
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
 
-            metric = self.metric_fn(preds.detach(), data[1])
+            metric = self.metric(preds.detach(), data[1])
 
             loss_value = loss.detach().item()
             metric_value = metric.detach().item()
@@ -90,14 +90,14 @@ class Trainer:
 
             logs = {}
             self.model.train()
-            train_loss, train_metric = self.step(self.model, 
+            train_loss, train_metric = self.step(
                                             epoch_num=epoch, 
                                             loader=self.train_loader, 
                                             is_train=True,
                                             )
 
             self.model.eval()
-            valid_loss, valid_metric = self.step(self.model, 
+            valid_loss, valid_metric = self.step(
                                             epoch_num=epoch, 
                                             loader=self.valid_loader, 
                                             is_train=False,
@@ -118,6 +118,6 @@ class Trainer:
 
 
 def train(args):
-    seed_everything()
+    seed_everything(args.seed)
     trainer = Trainer(args)
     trainer.fit()
