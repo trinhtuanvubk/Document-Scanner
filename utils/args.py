@@ -42,6 +42,7 @@ def get_args():
     parser.add_argument("--num_class", type=int, default=2)
     parser.add_argument("--data_dir", type=str, default='document_dataset_resized')
     parser.add_argument("--metric_name", type=str, default='iou', help='iou, dice')
+    parser.add_argument("--pretrained_path", type=str, default="model_repository/mbv3_averaged.pth")
     parser.add_argument("--checkpoint_path", type=str, default="model_repository/mbv3.pth")
 
     # infer
@@ -55,7 +56,7 @@ def get_args():
     parser.add_argument('--optimizer', type=str, default='adam')
     parser.add_argument('--weight_decay', type=float, default=0.05)
     parser.add_argument('--batch_size', type=int, default=32)
-    parser.add_argument('--num_epoch', type=str, default=100)
+    parser.add_argument('--num_epoch', type=int, default=100)
     parser.add_argument('--log_iter', type=int, default=10)
     parser.add_argument('--clip_grad_norm', type=float, default=1.0)
     parser.add_argument('--num_worker', type=int, default=16)
