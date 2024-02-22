@@ -4,11 +4,11 @@ from torch.utils.data import DataLoader
 
 def get_dataset(args):
 
-    train_img_dir = os.path.join(args.data_directory, "train", "images")
-    train_msk_dir = os.path.join(args.data_directory, "train", "masks")
+    train_img_dir = os.path.join(args.data_dir, "train", "images")
+    train_msk_dir = os.path.join(args.data_dir, "train", "masks")
 
-    valid_img_dir = os.path.join(args.data_directory, "valid", "images")
-    valid_msk_dir = os.path.join(args.data_directory, "valid", "masks")
+    valid_img_dir = os.path.join(args.data_dir, "valid", "images")
+    valid_msk_dir = os.path.join(args.data_dir, "valid", "masks")
 
     train_img_paths = [os.path.join(train_img_dir, i) for i in os.listdir(train_img_dir)]
     train_msk_paths = [os.path.join(train_msk_dir, i) for i in os.listdir(train_msk_dir)]
@@ -19,8 +19,8 @@ def get_dataset(args):
     train_ds = SegDataset(img_paths=train_img_paths, mask_paths=train_msk_paths, data_type="train")
     valid_ds = SegDataset(img_paths=valid_img_paths, mask_paths=valid_msk_paths, data_type="valid")
 
-    train_loader = DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=args.shuffle, pin_memory=True)
-    valid_loader = DataLoader(valid_ds, batch_size=args.batch_size, num_workers=args.num_workers, shuffle=args.shuffle, pin_memory=True)
+    train_loader = DataLoader(train_ds, batch_size=args.batch_size, num_workers=args.num_worker, shuffle=args.shuffle, pin_memory=True)
+    valid_loader = DataLoader(valid_ds, batch_size=args.batch_size, num_workers=args.num_worker, shuffle=args.shuffle, pin_memory=True)
 
     return train_loader, valid_loader
 
