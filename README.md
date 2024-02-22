@@ -17,8 +17,8 @@ pip install -r requirements.txt
 pip install nvidia-pyindex
 pip install onnx-graphsurgeon
 ```
-### Create dataset
 
+### Create dataset
 - Download raw scroped dataset and background
 
 - To gen full mask
@@ -64,6 +64,7 @@ python3 main.py --scenario infer \
 --image_size 384 \
 --checkpoint_path "model_repository/mbv3_averaged.pth"
 ```
+
 ### Export model
 - To export model to onnx
 ```bash
