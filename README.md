@@ -1,20 +1,12 @@
 # Document Scanner: Semantic Segmentation
 
-**This repository contains code for the blog post [Document Scanner: Semantic Segmentation using PyTorch-DeepLabV3](https://learnopencv.com/custom-document-segmentation-using-deep-learning/)**.
-
-In this post, you will learn the following,
-
-* Generate Synthetic Dataset.
-* Create a Combo loss function training a Custom Image Segmentation Model.
-* Train a Document Segmentation model using DeepLabv3-PyTorch.
-
-#### Dataset and Trained Model Download Links
+<!-- #### Dataset and Trained Model Download Links
 
 1. [Resized final dataset](https://www.dropbox.com/s/rk37cuwtav5j1s7/document_dataset_resized.zip?dl=1)
 2. [Model - MobileNetV3-Large backend](https://www.dropbox.com/s/4znmfi5ew1u5z9y/model_mbv3_iou_mix_2C049.pth?dl=1)
 3. [Model - Resnet50 backend](https://www.dropbox.com/s/kotc40uz6bhvpel/model_r50_iou_mix_2C020.pth?dl=1)
 
-[<img src="https://learnopencv.com/wp-content/uploads/2022/07/download-button-e1657285155454.png" alt="download" width="200">](https://www.dropbox.com/scl/fo/w3i08lmjnd6ba3td89a3p/h?dl=1&rlkey=unuq45366j21xctj9ovt9ehd3)
+[<img src="https://learnopencv.com/wp-content/uploads/2022/07/download-button-e1657285155454.png" alt="download" width="200">](https://www.dropbox.com/scl/fo/w3i08lmjnd6ba3td89a3p/h?dl=1&rlkey=unuq45366j21xctj9ovt9ehd3) -->
 
 ### Setup
 - To create `environment`:
@@ -25,30 +17,52 @@ pip install -r requirements.txt
 pip install nvidia-pyindex
 pip install onnx-graphsurgeon
 ```
-### Create dataset
 
+### Create dataset
 - Download raw scroped dataset and background
 
 - To gen full mask
 ```bash
-python3 generate_doc_set.py
+python3 main.py --scenario generate_doc_set
 ```
 
 - To resize
 ```bash
-python3 resizer.py -s DOCUMENTS/CHOSEN/images -d DOCUMENTS/CHOSEN/resized_images -x 640
-python3 resizer.py -s DOCUMENTS/CHOSEN/masks -d DOCUMENTS/CHOSEN/resized_masks -x 640
+python3 main.py --scenario resizer \
+-s DOCUMENTS/CHOSEN/images \
+-d DOCUMENTS/CHOSEN/resized_images 
+-x 640
 ```
 
-- To gen data (fix factor to change the ratio of image size and background size)
 ```bash
-python3 create_dataset.py
+python3 main.py --scenraio resizer \
+-s DOCUMENTS/CHOSEN/masks \
+-d DOCUMENTS/CHOSEN/resized_masks \
+-x 640
 ```
 
-### Simple Demo
-- To run streamlit app:
+- To gen data (config factor to change the ratio of image size and background size)
 ```bash
-streamlit run app.py --server.port 8080
+python3 main.py --scenario create_dataset
+```
+
+### Train
+- To train:
+```bash
+python3 main.py --scenario train \
+--backbone_model "mbv3" \
+--data_dir "document_dataset_resized" \
+--batch_size 32 \
+--num_epoch 100
+```
+
+### Inference
+- To infer:
+```bash
+python3 main.py --scenario infer \
+--data_infer "./test_images/IMG_20220721_162757.jpg" \
+--image_size 384 \
+--checkpoint_path "model_repository/mbv3_averaged.pth"
 ```
 
 ### Export model
@@ -61,7 +75,14 @@ python3 export_onnx.py
 ```bash
 onnx2tf -i path/to/model.onnx -o saved_model
 ```
-
+<!-- 
 ### Document Scanner Application
 
-<img src = 'app_images/app_demo.png'>
+<img src = 'app_images/app_demo.png'> -->
+
+
+### Simple Demo
+- To run streamlit app:
+```bash
+streamlit run app.py --server.port 8080
+```

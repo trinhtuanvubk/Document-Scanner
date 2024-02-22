@@ -3,3 +3,7 @@ Epay*
 **/*.pth
 onnx/*
 saved_*
+*.onnx
+*.ipynb
+*.md
+**/__pycache__/*
