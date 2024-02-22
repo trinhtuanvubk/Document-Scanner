@@ -23,8 +23,8 @@ def prepare_model(args):
 
     # Update the number of output channels for the output layer.
     # This will remove the pre-trained weights for the last layer.
-    model.classifier[4]     = nn.LazyConv2d(num_classes, 1)
-    model.aux_classifier[4] = nn.LazyConv2d(num_classes, 1)
+    model.classifier[4] = nn.LazyConv2d(args.num_class, 1)
+    model.aux_classifier[4] = nn.LazyConv2d(args.num_class, 1)
     
     if args.pretrained_path != None:
         checkpoints = torch.load(args.pretrained_path, map_location=args.device)

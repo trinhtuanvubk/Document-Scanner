@@ -3,6 +3,16 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
+def convert_2_onehot(matrix, num_classes=2):
+    '''
+    Perform one-hot encoding across the channel dimension.
+    '''
+    matrix = matrix.permute(0, 2, 3, 1)
+    matrix = torch.argmax(matrix, dim=-1)
+    matrix = torch.nn.functional.one_hot(matrix, num_classes=num_classes)
+    matrix = matrix.permute(0, 3, 1, 2)
+
+    return matrix
 
 
 def intermediate_metric_calculation(predictions, targets, use_dice=False, smooth=1e-6, dims=(2, 3)):
@@ -53,9 +63,9 @@ class Loss(nn.Module):
         return total_loss
     
 class Metric(nn.Module):
-    def __init__(self, num_classes=2, smooth=1e-6, use_dice=False):
+    def __init__(self, args, smooth=1e-6, use_dice=False):
         super().__init__()
-        self.num_classes = num_classes
+        self.num_classes = args.num_class
         self.smooth      = smooth
         self.use_dice    = use_dice
     
